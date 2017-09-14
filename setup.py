@@ -16,10 +16,10 @@ except ImportError:
 args = {
     'name': 'poclbm',
     'version': VERSION,
-    'description': 'Bitcoin miner in python',
-    'author': 'Momchil Georgiev',
-    'author_email': 'pishtov@gmail.com',
-    'url': 'https://github.com/m0mchil/poclbm/',
+    'description': 'Genesis Bitcoin miner in python',
+    'author': 'Cross',
+    'author_email': 'cross@areatak.com',
+    'url': 'https://github.com/areatak/gpuminer-genesis/',
     'install_requires': ['pyserial>=2.6'],
     'scripts': ['poclbm.py'],
 }

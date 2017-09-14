@@ -146,6 +146,7 @@ class OpenCLMiner(Miner):
 		return str(self.options.platform) + ':' + str(self.device_index) + ':' + self.device_name
 
 	def nonce_generator(self, nonces):
+
 		for i in xrange(0, len(nonces) - 4, 4):
 			nonce = bytearray_to_uint32(nonces[i:i+4])
 			if nonce:
@@ -175,6 +176,7 @@ class OpenCLMiner(Miner):
 		work = None
 		temperature = 0
 		while True:
+
 			if self.should_stop: return
 
 			sleep(self.frameSleep)
@@ -182,10 +184,12 @@ class OpenCLMiner(Miner):
 			if (not work) or (not self.work_queue.empty()):
 				try:
 					work = self.work_queue.get(True, 1)
+
 				except Empty: continue
 				else:
 					if not work: continue
-					nonces_left = hashspace
+					self.nonces_left = hashspace
+
 					state = work.state
 					f = [0] * 8
 					state2 = partial(state, work.merkle_end, work.time, work.difficulty, f)
@@ -216,8 +220,7 @@ class OpenCLMiner(Miner):
 			if temperature < self.cutoff_temp:
 				self.kernel.set_arg(14, pack('<I', base))
 				cl.enqueue_nd_range_kernel(queue, self.kernel, (global_threads,), (self.worksize,))
-
-				nonces_left -= global_threads
+				self.nonces_left -= global_threads
 				threads_run_pace += global_threads
 				threads_run += global_threads
 				base = uint32(base + global_threads)
@@ -251,7 +254,7 @@ class OpenCLMiner(Miner):
 			queue.finish()
 			cl.enqueue_read_buffer(queue, output_buffer, output)
 			queue.finish()
-
+			
 			if output[-1]:
 				result = Object()
 				result.header = work.header
@@ -268,13 +271,15 @@ class OpenCLMiner(Miner):
 				self.switch.put(result)
 				output[:] = b'\x00' * len(output)
 				cl.enqueue_write_buffer(queue, output_buffer, output)
-
+			if self.switch.should_stop:
+				self.stop()
 			if not self.switch.update_time:
-				if nonces_left < 3 * global_threads * self.frames:
+				if self.nonces_left < 3 * global_threads * self.frames:
 					self.update = True
-					nonces_left += 0xFFFFFFFFFFFF
-				elif 0xFFFFFFFFFFF < nonces_left < 0xFFFFFFFFFFFF:
-					say_line('warning: job finished, %s is idle', self.id()) 
+					self.nonces_left += 0xFFFFFFFFFFFF
+
+				elif 0xFFFFFFFFFFF < self.nonces_left < 0xFFFFFFFFFFFF:
+					say_line('warning: job finished, %s is idle', self.id())
 					work = None
 			elif now - last_n_time > 1:
 				work.time = bytereverse(bytereverse(work.time) + 1)

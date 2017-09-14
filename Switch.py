@@ -78,16 +78,17 @@ class Switch(object):
 		return s
 
 	def parse_proxy(self, proxy):
-		proxy.port = 9050
-		proxy.host = proxy.host.split(':')
-		if len(proxy.host) > 1:
-			proxy.port = int(proxy.host[1]); proxy.host = proxy.host[0]
-
-		proxy.type = socks.PROXY_TYPE_SOCKS5
-		if proxy.proto == 'http':
-			proxy.type = socks.PROXY_TYPE_HTTP
-		elif proxy.proto == 'socks4':
-			proxy.type = socks.PROXY_TYPE_SOCKS4
+		return
+#		proxy.port = 9050
+#		proxy.host = proxy.host.split(':')
+#		if len(proxy.host) > 1:
+#			proxy.port = int(proxy.host[1]); proxy.host = proxy.host[0]
+#
+#		proxy.type = socks.PROXY_TYPE_SOCKS5
+#		if proxy.proto == 'http':
+#			proxy.type = socks.PROXY_TYPE_HTTP
+#		elif proxy.proto == 'socks4':
+#			proxy.type = socks.PROXY_TYPE_SOCKS4
 
 	def add_miner(self, miner):
 		self.miners.append(miner)

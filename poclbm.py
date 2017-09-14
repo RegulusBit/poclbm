@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from Switch import Switch
+from GenesisMiner import GenesisMiner
 from optparse import OptionGroup, OptionParser
 from time import sleep
 from util import tokenize
@@ -75,26 +75,22 @@ options.cutoff_interval = tokenize(options.cutoff_interval, 'cutoff_interval', [
 
 switch = None
 try:
-	switch = Switch(options)
+	switch = GenesisMiner(options)
 
 	if not options.no_ocl:
 		import OpenCLMiner
 		for miner in OpenCLMiner.initialize(options):
 			switch.add_miner(miner)
 
-	if not options.no_bfl:
-		import BFLMiner
-		for miner in BFLMiner.initialize(options):
-			switch.add_miner(miner)
+	# if not options.no_bfl:
+	# 	import BFLMiner
+	# 	for miner in BFLMiner.initialize(options):
+	# 		switch.add_miner(miner)
 
-	if not switch.servers:
-		print '\nAt least one server is required\n'
-	elif not switch.miners:
-		print '\nNothing to mine on, exiting\n'
-	else:
-		for miner in switch.miners:
-			miner.start()
-		switch.loop()
+
+	for miner in switch.miners:
+		miner.start()
+	switch.loop()
 except KeyboardInterrupt:
 	print '\nbye'
 finally:
